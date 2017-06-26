@@ -69,6 +69,5 @@ namespace CShell.Hosting.Tests
         public IPackageAssemblyResolver PackageAssemblyResolver { get; private set; }
         public IPackageInstaller PackageInstaller { get; private set; }
         public IInstallationProvider InstallationProvider { get; private set; }
-
     }
 }

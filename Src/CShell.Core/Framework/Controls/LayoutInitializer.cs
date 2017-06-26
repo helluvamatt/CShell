@@ -7,92 +7,109 @@ using Xceed.Wpf.AvalonDock.Layout;
 
 namespace CShell.Framework.Controls
 {
-	public class LayoutInitializer : ILayoutUpdateStrategy
-	{
-        //http://avalondock.codeplex.com/wikipage?title=AvalonDock%202.0%20Getting%20Start%20Guide&referringTitle=Documentation
-		public bool BeforeInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableToShow, ILayoutContainer destinationContainer)
-		{
-            if (anchorableToShow.Content is ITool)
+    public class LayoutInitializer : ILayoutUpdateStrategy
+    {
+        public bool BeforeInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableToShow, ILayoutContainer destinationContainer)
+        {
+            ITool tool = anchorableToShow.Content as ITool;
+            if (tool != null)
             {
-                var preferredLocation = ((ITool) anchorableToShow.Content).PreferredLocation;
+                PaneLocation preferredLocation = tool.PreferredLocation;
                 string paneName = GetPaneName(preferredLocation);
-                var toolsPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == paneName);
+                LayoutAnchorablePane toolsPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == paneName);
                 if (toolsPane == null)
                 {
                     switch (preferredLocation)
                     {
                         case PaneLocation.Left:
-                        {
-                            //TODO: this should use two steps: first, try to add to existing "LayoutAnchorablePane" if not create layoutAnchorGroup like below
-                            var layoutAnchorSide = layout.Descendents().OfType<LayoutAnchorSide>().First(side => side.Side == AnchorSide.Left);
-                            var layoutAnchorGroup = new LayoutAnchorGroup();
-                            layoutAnchorGroup.InsertChildAt(0, anchorableToShow);
-                            layoutAnchorSide.InsertChildAt(0, layoutAnchorGroup);
-                            anchorableToShow.AutoHideWidth = 200;
-
-                            //var parent = layout.Descendents().OfType<LayoutPanel>().First(d => d.Orientation == Orientation.Horizontal);
-                            //toolsPane = new LayoutAnchorablePane { DockWidth = new GridLength(200, GridUnitType.Pixel) };
-                        }
+                            toolsPane = CreateAnchorablePane(layout, Orientation.Horizontal, paneName, InsertPosition.Start);
                             break;
                         case PaneLocation.Right:
-                        {
-                            var parent = layout.Descendents().OfType<LayoutPanel>().First(d => d.Orientation == Orientation.Horizontal);
-                            toolsPane = new LayoutAnchorablePane { DockWidth = new GridLength(200, GridUnitType.Pixel) };
-                            parent.Children.Add(toolsPane);
-                        }
+                            toolsPane = CreateAnchorablePane(layout, Orientation.Horizontal, paneName, InsertPosition.End);
                             break;
                         case PaneLocation.Bottom:
-                        {
-                            var ds = layout.Descendents().ToList();
-                            var items = layout.Descendents().OfType<LayoutPanel>().ToList();
-                            var items2 = layout.Descendents().OfType<LayoutAnchorGroup>().ToList();
-                            //var parent = items2.First();
-                            var parent = layout.Descendents().OfType<LayoutPanel>().First(d => d.Orientation == Orientation.Vertical);
-                            toolsPane = new LayoutAnchorablePane { DockHeight = new GridLength(300, GridUnitType.Pixel) };
-                            parent.Children.Add(toolsPane);
-                        }
+                            toolsPane = CreateAnchorablePane(layout, Orientation.Vertical, paneName, InsertPosition.End);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-                if(toolsPane != null)
-                    toolsPane.Children.Add(anchorableToShow);
+                toolsPane.Children.Add(anchorableToShow);
                 return true;
             }
 
-			return false;
-		}
+            return false;
+        }
 
+        private static string GetPaneName(PaneLocation location)
+        {
+            switch (location)
+            {
+                case PaneLocation.Left:
+                    return "LeftPane";
+                case PaneLocation.Right:
+                    return "RightPane";
+                case PaneLocation.Bottom:
+                    return "BottomPane";
+                default:
+                    throw new ArgumentOutOfRangeException("location");
+            }
+        }
 
+        private static LayoutAnchorablePane CreateAnchorablePane(LayoutRoot layout, Orientation orientation, string paneName, InsertPosition position)
+        {
+            var parent = layout.Descendents().OfType<LayoutPanel>().First(d => d.Orientation == orientation);
+            var toolsPane = new LayoutAnchorablePane { Name = paneName };
+            if (position == InsertPosition.Start)
+            {
+                parent.InsertChildAt(0, toolsPane);
+            }
+            else
+            {
+                parent.Children.Add(toolsPane);
+            }
+            return toolsPane;
+        }
 
-		private static string GetPaneName(PaneLocation location)
-		{
-			switch (location)
-			{
-				case PaneLocation.Left:
-					return "LeftPane";
-				case PaneLocation.Right:
-					return "RightPane";
-				case PaneLocation.Bottom:
-					return "BottomPane";
-				default:
-					throw new ArgumentOutOfRangeException("location");
-			}
-		}
+        private enum InsertPosition
+        {
+            Start,
+            End
+        }
 
-		public void AfterInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableShown)
-		{
-			
-		}
+        public void AfterInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableShown)
+        {
+            // If this is the first anchorable added to this pane, then use the preferred size.
+            var tool = anchorableShown.Content as ITool;
+            if (tool != null)
+            {
+                var anchorablePane = anchorableShown.Parent as LayoutAnchorablePane;
+                if (anchorablePane != null && anchorablePane.ChildrenCount == 1)
+                {
+                    switch (tool.PreferredLocation)
+                    {
+                        case PaneLocation.Left:
+                        case PaneLocation.Right:
+                            anchorablePane.DockWidth = new GridLength(tool.PreferredWidth, GridUnitType.Pixel);
+                            break;
+                        case PaneLocation.Bottom:
+                            anchorablePane.DockHeight = new GridLength(tool.PreferredHeight, GridUnitType.Pixel);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+        }
 
-	    public bool BeforeInsertDocument(LayoutRoot layout, LayoutDocument anchorableToShow, ILayoutContainer destinationContainer)
-	    {
-	        return false;
-	    }
+        public bool BeforeInsertDocument(LayoutRoot layout, LayoutDocument anchorableToShow, ILayoutContainer destinationContainer)
+        {
+            return false;
+        }
 
-	    public void AfterInsertDocument(LayoutRoot layout, LayoutDocument anchorableShown)
-	    {
-	    }
-	}
+        public void AfterInsertDocument(LayoutRoot layout, LayoutDocument anchorableShown)
+        {
+
+        }
+    }
 }

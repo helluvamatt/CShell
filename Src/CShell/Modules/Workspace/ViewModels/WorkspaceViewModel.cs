@@ -11,7 +11,7 @@ using Caliburn.Micro;
 
 namespace CShell.Modules.Workspace.ViewModels
 {
-	[Export]
+    [Export]
     [Export(typeof(ITool))]
     public class WorkspaceViewModel : Tool
 	{
@@ -19,7 +19,7 @@ namespace CShell.Modules.Workspace.ViewModels
         private readonly CShell.Workspace workspace;
 
 	    [ImportingConstructor]
-        public WorkspaceViewModel(CShell.Workspace workspace)
+        public WorkspaceViewModel(CShell.Workspace workspace, IShell shell)
         {
             this.shell = shell;
             DisplayName = "Workspace Explorer";

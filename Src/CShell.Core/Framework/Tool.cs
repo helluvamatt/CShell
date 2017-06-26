@@ -31,7 +31,17 @@ namespace CShell.Framework
 			}
 		}
 
-		protected Tool()
+	    public virtual double PreferredWidth
+	    {
+	        get { return 200; }
+	    }
+
+	    public virtual double PreferredHeight
+	    {
+	        get { return 200; }
+	    }
+
+        protected Tool()
 		{
 			IsVisible = true;
 		}

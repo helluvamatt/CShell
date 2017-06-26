@@ -11,6 +11,11 @@ using ScriptCs.Contracts;
 
 namespace CShell.Hosting
 {
+    using System.ComponentModel.Composition;
+
+    [Export]
+    [Export(typeof(IScriptExecutor))]
+    [Export(typeof(IRepl))]
     public class ReplScriptExecutor : ScriptExecutor, IReplScriptExecutor
     {
         private readonly IReplOutput replOutput;
@@ -26,7 +31,7 @@ namespace CShell.Hosting
             ILogProvider logProvider,
             IEnumerable<IReplCommand> replCommands,
             IDefaultReferences defaultReferences)
-            : base(fileSystem, filePreProcessor, scriptEngine, logProvider)
+            : base(fileSystem, filePreProcessor, scriptEngine, logProvider, new ScriptInfo())
         {
             this.replOutput = replOutput;
             this.serializer = serializer;

@@ -60,8 +60,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <ContentControl Grid.Row="1" cal:View.Model="{Binding}"
-                                                IsTabStop="False" />
+                                <ContentControl Grid.Row="1" cal:View.Model="{Binding}" IsTabStop="False" />
                             </Grid>
                         </DataTemplate>
                     </controls:PanesTemplateSelector.DocumentTemplate>
@@ -72,8 +71,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <ContentControl Grid.Row="1" cal:View.Model="{Binding}"
-                                                IsTabStop="False" />
+                                <ContentControl Grid.Row="1" cal:View.Model="{Binding}" IsTabStop="False" />
                             </Grid>
                         </DataTemplate>
                     </controls:PanesTemplateSelector.ToolTemplate>
@@ -83,14 +81,14 @@
             <xcad:DockingManager.LayoutItemContainerStyleSelector>
 				<controls:PanesStyleSelector>
 					<controls:PanesStyleSelector.DocumentStyle>
-						<Style TargetType="{x:Type xcad:LayoutItem}">
-							<Setter Property="Title" Value="{Binding Model.DisplayName, Mode=OneWay}" />
+                        <Style TargetType="{x:Type xcad:LayoutItem}">
+                            <Setter Property="Title" Value="{Binding Model.DisplayName, Mode=OneWay}" />
                             <Setter Property="ContentId" Value="{Binding Model.Uri, Mode=OneWay, Converter={StaticResource UriConverter}}" />
                             <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
 						</Style>
 					</controls:PanesStyleSelector.DocumentStyle>
 					<controls:PanesStyleSelector.ToolStyle>
-						<Style TargetType="{x:Type xcad:LayoutAnchorableItem}">
+                        <Style TargetType="{x:Type xcad:LayoutAnchorableItem}">
                             <Setter Property="Title" Value="{Binding Model.DisplayName, Mode=OneWay}" />
                             <Setter Property="ContentId" Value="{Binding Model.Uri, Mode=OneWay, Converter={StaticResource UriConverter}}" />
 							<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
@@ -107,10 +105,12 @@
             
             <xcad:LayoutRoot>
                 <xcad:LayoutPanel x:Name="VerticalPanel" Orientation="Vertical">
-                    <xcad:LayoutDocumentPane />
+                    <xcad:LayoutPanel x:Name="HorizontalPanel" Orientation="Horizontal">
+                        <xcad:LayoutDocumentPane />
+                    </xcad:LayoutPanel>
                 </xcad:LayoutPanel>
             </xcad:LayoutRoot>
-            
+
         </xcad:DockingManager>
 	</DockPanel>
 </Window>

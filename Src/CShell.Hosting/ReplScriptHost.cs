@@ -16,7 +16,10 @@ namespace CShell.Hosting
     {
         public IScriptHost CreateScriptHost(IScriptPackManager scriptPackManager, string[] scriptArgs)
         {
-            return new ReplScriptHost(scriptPackManager, new ScriptEnvironment(scriptArgs));
+            IConsole console = new MockConsole();
+            Printers printers = new Printers(new ObjectSerializer());
+
+            return new ReplScriptHost(scriptPackManager, new ScriptEnvironment(scriptArgs, console, printers));
         }
     }
 }

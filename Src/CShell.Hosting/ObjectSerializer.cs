@@ -39,6 +39,8 @@ namespace CShell.Hosting
             }
         }
 
+        public int Width => throw new NotImplementedException();
+
         public string ReadLine()
         {
             throw new NotImplementedException();
@@ -60,6 +62,11 @@ namespace CShell.Hosting
         }
 
         public void WriteLine()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ReadLine(string prompt)
         {
             throw new NotImplementedException();
         }

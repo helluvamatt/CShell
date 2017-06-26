@@ -11,5 +11,7 @@ namespace CShell.Framework
 		ICommand CloseCommand { get; }
 		PaneLocation PreferredLocation { get; }
 		bool IsVisible { get; set; }
-	}
+	    double PreferredWidth { get; }
+	    double PreferredHeight { get; }
+    }
 }
