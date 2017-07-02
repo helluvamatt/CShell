@@ -2,11 +2,10 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
-using System.Windows.Input;
+
 using CShell.Framework;
 using CShell.Framework.Menus;
 using CShell.Framework.Results;
-using CShell.Framework.Services;
 using CShell.Modules.Workspace.Results;
 using CShell.Modules.Workspace.ViewModels;
 using Caliburn.Micro;
@@ -28,7 +27,6 @@ namespace CShell.Modules.Workspace
                 .Add(new MenuItem("Workspace Explorer", OpenWorkspaceExplorer).WithIcon("Resources/Icons/FileBrowser.png"));
 
             var workspaceViewModel = IoC.Get<WorkspaceViewModel>();
-		    //workspaceViewModel.IsVisible = false;
             Shell.ShowTool(workspaceViewModel);
 
 		    var addNewFile = new MenuItem("Add New File...", AddNewFile);

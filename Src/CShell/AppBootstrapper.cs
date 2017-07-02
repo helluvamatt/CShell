@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.ReflectionModel;
@@ -11,17 +10,16 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using CShell.Framework;
+
 using CShell.Framework.Services;
 using Caliburn.Micro;
 using CShell.Hosting;
-using ScriptCs;
-using ScriptCs.Contracts;
+
 using IModule = CShell.Framework.IModule;
 
 namespace CShell
 {
-    public class AppBootstrapper : Caliburn.Micro.BootstrapperBase
+    public class AppBootstrapper : BootstrapperBase
     {
         static AppBootstrapper()
         {

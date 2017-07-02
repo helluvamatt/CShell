@@ -1,6 +1,5 @@
 ﻿namespace CShell.Modules.Workspace.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
@@ -9,8 +8,6 @@
     using Caliburn.Micro;
 
     using CShell.Hosting.Package;
-    using CShell.Modules.Workspace.Results;
-    using CShell.Modules.Workspace.Views;
 
     using ScriptCs;
 

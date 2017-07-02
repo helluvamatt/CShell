@@ -2,8 +2,6 @@ namespace CShell.Hosting.Package
 {
     using System.Collections.Generic;
 
-    using NuGet;
-
     using ScriptCs.Contracts;
 
     public interface INugetInstallationProvider
