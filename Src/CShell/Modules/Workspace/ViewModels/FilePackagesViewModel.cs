@@ -23,7 +23,7 @@ namespace CShell.Modules.Workspace.ViewModels
         public IEnumerable<IResult> MangePackages()
         {
             var windowSettings = new Dictionary<string, object> { { "SizeToContent", SizeToContent.Manual }, { "Width", 500.0 }, { "Height", 500.0 } };
-            var dialog = new AssemblyPackagesViewModel();
+            var dialog = IoC.Get<AssemblyPackagesViewModel>();
             yield return Show.Dialog(dialog, windowSettings);
         }
     }

@@ -8,7 +8,7 @@ using IFileSystem = ScriptCs.Contracts.IFileSystem;
 
 namespace CShell.Hosting.Package
 {
-    public class NugetInstallationProvider : IInstallationProvider
+    public class NugetInstallationProvider : IInstallationProvider, INugetInstallationProvider
     {
         private readonly IFileSystem _fileSystem;
         private readonly ILog _logger;
@@ -62,11 +62,26 @@ namespace CShell.Hosting.Package
             return sources.Select(i => i.Source);
         }
 
+        public IEnumerable<IPackageInfo> SearchPackages(string filter, int page, int pageSize)
+        {
+            List<IPackage> searchPackages = _manager.SourceRepository
+                .GetPackages()
+                .Where(p => string.IsNullOrWhiteSpace(filter) || p.Title.Contains(filter) || p.Id.Contains(filter))
+                .Where(p => p.IsLatestVersion)
+                .OrderByDescending(p => p.DownloadCount)
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .ToList();
+            return searchPackages.Select(x => new PackageObject(x, PackageContainer.GetSupportedFrameworkName(x)));
+        }
+
         public void InstallPackage(IPackageReference packageId, bool allowPreRelease = false)
         {
             var version = GetVersion(packageId);
             var packageName = packageId.PackageId + " " + (version == null ? string.Empty : packageId.Version.ToString());
-            _manager.InstallPackage(packageId.PackageId, version, allowPrereleaseVersions: allowPreRelease, ignoreDependencies: false);
+            bool ignoreDependencies = false;
+
+            _manager.InstallPackage(packageId.PackageId, version, allowPrereleaseVersions: allowPreRelease, ignoreDependencies: ignoreDependencies);
             _logger.Info("Installed: " + packageName);
         }
 

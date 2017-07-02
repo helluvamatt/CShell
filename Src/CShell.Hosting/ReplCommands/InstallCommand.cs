@@ -5,22 +5,26 @@ using ScriptCs.Contracts;
 
 namespace CShell.Hosting.ReplCommands
 {
+    using CShell.Framework.Services;
+
     public class InstallCommand : IReplCommand
     {
         private readonly IPackageInstaller _packageInstaller;
         private readonly IPackageAssemblyResolver _packageAssemblyResolver;
-        private readonly ILog _logger;
+
+        private readonly IReplOutput _replOutput;
+
         private readonly IInstallationProvider _installationProvider;
 
         public InstallCommand(
             IPackageInstaller packageInstaller,
             IPackageAssemblyResolver packageAssemblyResolver,
-            ILog logger,
+            IReplOutput replOutput,
             IInstallationProvider installationProvider)
         {
             _packageInstaller = packageInstaller;
             _packageAssemblyResolver = packageAssemblyResolver;
-            _logger = logger;
+            _replOutput = replOutput;
             _installationProvider = installationProvider;
         }
 
@@ -50,7 +54,7 @@ namespace CShell.Hosting.ReplCommands
 
             allowPre = args.Length >= 3 && args[2].ToString().ToUpperInvariant() == "PRE";
 
-            _logger.InfoFormat("Installing {0}", args[0]);
+            _replOutput.WriteLine("Installing {0}", args[0]);
 
             _installationProvider.Initialize();
 
@@ -67,7 +71,7 @@ namespace CShell.Hosting.ReplCommands
 
             foreach (var dll in dlls)
             {
-                _logger.InfoFormat("Added reference to {0}", dll);
+                _replOutput.WriteLine("Added reference to {0}", dll);
             }
 
             return null;

@@ -86,7 +86,9 @@ namespace CShell.Sinks.Xhtml.XhtmlDumper
         {
             var elementType = GetElementTypeOfEnumerable(enumerable);
             if (elementType == null)
+            {
                 return false;
+            }
 
             //get the members (fields and properties)
             var members = GetMembers(elementType);
@@ -95,7 +97,7 @@ namespace CShell.Sinks.Xhtml.XhtmlDumper
             writer.RenderBeginTag(HtmlTextWriterTag.Table);
 
             //if the element type is an element that needs to be rendered atomically we use a different method 
-            if(IsSimpleType(elementType))
+            if (IsSimpleType(elementType))
             {
                 writer.RenderBeginTag(HtmlTextWriterTag.Tr);
                 writer.RenderBeginTag(HtmlTextWriterTag.Th);
@@ -110,6 +112,49 @@ namespace CShell.Sinks.Xhtml.XhtmlDumper
                     writer.Write(element.ToString());
                     writer.RenderEndTag();
                     writer.RenderEndTag();
+                }
+            }
+            else if (elementType == typeof(IDictionary<string, object>))
+            {
+                ICollection<string> columns = new List<string>(0);
+                IEnumerator enumerator = enumerable.GetEnumerator();
+                IList<IDictionary<string, object>> items = new List<IDictionary<string, object>>();
+
+                writer.RenderBeginTag(HtmlTextWriterTag.Tr);
+                while (enumerator.MoveNext())
+                {
+                    IDictionary<string, object> item = (IDictionary<string, object>)enumerator.Current;
+
+                    items.Add(item);
+
+                    if (items.Count == 1)
+                    {
+                        columns = item.Keys;
+
+                        foreach (var columnName in columns)
+                        {
+                            writer.RenderBeginTag(HtmlTextWriterTag.Th);
+                            writer.Write(columnName);
+                            writer.RenderEndTag();
+                        }
+                    }
+                }
+              
+                writer.RenderEndTag(); //tr
+                writer.WriteLine();
+
+                //write all the items
+                foreach (IDictionary<string, object> item in items)
+                {
+                    writer.RenderBeginTag(HtmlTextWriterTag.Tr);
+                    foreach (var columnName in columns)
+                    {
+                        writer.RenderBeginTag(HtmlTextWriterTag.Td);
+                        RenderValue(item[columnName], depth, writer);
+                        writer.RenderEndTag(); //td
+                    }
+                    writer.RenderEndTag(); //tr
+                    writer.WriteLine();
                 }
             }
             else
@@ -182,6 +227,38 @@ namespace CShell.Sinks.Xhtml.XhtmlDumper
             }
             else if (valueType == typeof(DateTime) ||
                 valueType == typeof(DateTimeOffset))
+            {
+                //todo: optional date time formatting
+                writer.Write(value);
+            }
+            else if (IsSimpleType(valueType))
+            {
+                writer.Write(value);
+            }
+            else
+            {
+                //recurively call the render method to descend one level in the object tree
+                Render(value, null, depth - 1, writer);
+            }
+        }
+
+        private void RenderValue(object value, int depth, XhtmlTextWriter writer)
+        {
+            if (value == null)
+            {
+                writer.Write("null");
+                return;
+            }
+
+            Type valueType = value.GetType();
+            if (valueType == typeof(double) ||
+                     valueType == typeof(decimal) ||
+                     valueType == typeof(float))
+            {
+                writer.Write("{0:0.00}", value);
+            }
+            else if (valueType == typeof(DateTime) ||
+                     valueType == typeof(DateTimeOffset))
             {
                 //todo: optional date time formatting
                 writer.Write(value);

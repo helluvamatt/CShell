@@ -20,7 +20,12 @@ namespace CShell.Hosting
     {
         private readonly IReplOutput replOutput;
         private readonly IObjectSerializer serializer;
+
+        private readonly IFileSystem _fileSystem;
+
         private readonly IDefaultReferences defaultReferences;
+
+        private readonly IPackageAssemblyResolver _packageAssemblyResolver;
 
         public ReplScriptExecutor(
             IReplOutput replOutput,
@@ -30,12 +35,16 @@ namespace CShell.Hosting
             IScriptEngine scriptEngine,
             ILogProvider logProvider,
             IEnumerable<IReplCommand> replCommands,
-            IDefaultReferences defaultReferences)
+            IDefaultReferences defaultReferences,
+            IPackageAssemblyResolver packageAssemblyResolver)
             : base(fileSystem, filePreProcessor, scriptEngine, logProvider, new ScriptInfo())
         {
             this.replOutput = replOutput;
             this.serializer = serializer;
+            _fileSystem = fileSystem;
             this.defaultReferences = defaultReferences;
+            _packageAssemblyResolver = packageAssemblyResolver;
+
             Commands = replCommands != null ? replCommands
                 .Where(x => x.GetType().Namespace.StartsWith("CShell")) //hack to only include CShell commands for now
                 .Where(x => x.CommandName != null)
@@ -206,7 +215,6 @@ namespace CShell.Hosting
             return result ?? ScriptResult.Empty;
         }
 
-
         private static string GetInvalidCommandArgumentMessage(string argument)
         {
             return string.Format(CultureInfo.InvariantCulture, "Argument is not a valid expression: {0}", argument);
@@ -218,7 +226,16 @@ namespace CShell.Hosting
             ImportNamespaces(typeof(Shell).Namespace);
             AddReferences(this.defaultReferences.Assemblies.Distinct().ToArray());
             AddReferences(this.defaultReferences.AssemblyPaths.Distinct().ToArray());
+            AddReferences(GetPackageReferences());
             ImportNamespaces(this.defaultReferences.Namespaces.Distinct().ToArray());
+        }
+
+        private string[] GetPackageReferences()
+        {
+            string[] dlls = _packageAssemblyResolver.GetAssemblyNames(Path.Combine(_fileSystem.CurrentDirectory, Constants.PackagesFolder))
+                .Except(References.Paths).ToArray();
+
+            return dlls;
         }
 
         public override void AddReferences(params Assembly[] references)
@@ -286,7 +303,6 @@ namespace CShell.Hosting
             }
             return new string[0];
         }
-
 
         public void ExecuteConfigScript()
         {

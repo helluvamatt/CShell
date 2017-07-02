@@ -7,7 +7,7 @@ using ScriptCs.Contracts;
 
 namespace CShell.Hosting.Package
 {
-    internal class PackageObject : IPackageObject
+    internal class PackageObject : IPackageObject, IPackageInfo
     {
         private const string Dll = ".dll";
         private const string Exe = ".exe";
@@ -20,6 +20,12 @@ namespace CShell.Hosting.Package
             Id = package.Id;
             Version = package.Version.Version;
             TextVersion = package.Version.ToString();
+            DownloadCount = package.DownloadCount;
+            Description = package.Description;
+            Title = package.Title ?? package.Id;
+            IconUrl = package.IconUrl ?? new Uri("https://www.nuget.org/Content/Images/packageDefaultIcon.png", UriKind.Absolute);
+            PublishedDate = package.Published.GetValueOrDefault(DateTimeOffset.Now).LocalDateTime.ToShortDateString();
+            Authors = string.Join(", ", package.Authors);
             FrameworkAssemblies = package.FrameworkAssemblies
                 .Where(x => x.SupportedFrameworks.Any(y => y == frameworkName))
                 .Select(x => x.AssemblyName);
@@ -30,6 +36,18 @@ namespace CShell.Hosting.Package
                 Dependencies = dependencies.Select(i => new PackageObject(i.Id) { FrameworkName = frameworkName });
             }
         }
+
+        public string Authors { get; private set; }
+
+        public string PublishedDate { get; private set; }
+
+        public Uri IconUrl { get; private set; }
+
+        public string Title { get; private set; }
+
+        public string Description { get; private set; }
+
+        public int DownloadCount { get; private set; }
 
         public PackageObject(string packageId)
         {

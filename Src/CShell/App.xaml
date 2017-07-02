@@ -9,6 +9,78 @@
                 <ResourceDictionary>
                     <local:AppBootstrapper x:Key="bootstrapper" />
                 </ResourceDictionary>
+                <ResourceDictionary>
+                    <Style x:Key="TextBase" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontFamily" Value="Arial"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="TextTrimming" Value="WordEllipsis"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="TextOptions.TextHintingMode" Value="Auto"/>
+                        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal"/>
+                        <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+                    </Style>
+                    
+                    <Style x:Key="SubHeading" TargetType="TextBlock" BasedOn="{StaticResource TextBase}">
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Focusable" Value="False"/>
+                    </Style>
+
+                    <Style x:Key="Muted" TargetType="TextBlock" BasedOn="{StaticResource TextBase}">
+                        <Setter Property="Foreground" Value="SlateGray"/>
+                    </Style>
+
+                    <Style x:Key="MutedSubHeading" TargetType="TextBlock" BasedOn="{StaticResource SubHeading}">
+                        <Setter Property="Foreground" Value="SlateGray"/>
+                    </Style>
+
+
+                    <Style x:Key="IconFont" TargetType="TextBlock" BasedOn="{StaticResource TextBase}">
+                        <Setter Property="FontFamily" Value="pack://application:,,,/CShell;component/#FontAwesome"/>
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+
+                    <Style x:Key="IconCloudDownload" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf0ed;"/>
+                    </Style>
+
+                    <Style x:Key="IconCalendarPlus" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf271;"/>
+                    </Style>
+
+                    <Style x:Key="IconArchive" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf187;"/>
+                    </Style>
+
+                    <Style x:Key="IconTrash" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf014;"/>
+                    </Style>
+
+                    <Style x:Key="IconArrowCircleUp" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf01b;"/>
+                    </Style>
+
+                    <Style x:Key="IconDownload" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf019;"/>
+                    </Style>
+
+                    <Style x:Key="IconExternalLink" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf08e;"/>
+                    </Style>
+
+                    <Style x:Key="IconList" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf03a;"/>
+                    </Style>
+
+                    <Style x:Key="IconBalanceScale" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf24e;"/>
+                    </Style>
+
+                    <Style x:Key="IconCheckCircle" TargetType="TextBlock" BasedOn="{StaticResource IconFont}">
+                        <Setter Property="Text" Value="&#xf05d;"/>
+                    </Style>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -14,6 +14,8 @@ using ScriptCs.Engine.Roslyn;
 
 namespace CShell.Hosting
 {
+    using System.IO;
+
     using CShell.Framework.Services;
 
     public static class HostingHelpers
@@ -28,7 +30,7 @@ namespace CShell.Hosting
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(ScriptServices).Assembly, hostingBuilder)); //ScriptCS.Core
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(CSharpScriptEngine).Assembly, hostingBuilder)); //CShell.Engine.Roslyn
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(HostingHelpers).Assembly, hostingBuilder)); //CShell.Hosting
-
+ 
             //add singletons
             var container = new CompositionContainer(catalog);
             var batch = new CompositionBatch();
@@ -40,6 +42,7 @@ namespace CShell.Hosting
         {
             builder.ForTypesDerivedFrom<ILineProcessor>().Export<ILineProcessor>();
             builder.ForTypesDerivedFrom<IReplCommand>().SelectNonObsoleteConstructor().Export<IReplCommand>();
+            builder.ForTypesDerivedFrom<IScriptPack>().Export<IScriptPack>();
 
             builder.ForType<ReplLogProvider>().SelectConstructor(b => b.First(c => c.GetParameters().Length == 1)).Export<ILogProvider>();
             builder.ForType<CShell.Hosting.FileSystem>().Export<IFileSystem>(); //override bin and nuget locations
@@ -52,11 +55,11 @@ namespace CShell.Hosting
 
             builder.ForType<PackageContainer>().Export<IPackageContainer>();
             builder.ForType<PackageAssemblyResolver>().SelectNonObsoleteConstructor().Export<IPackageAssemblyResolver>();
-            builder.ForType<NugetInstallationProvider>().Export<IInstallationProvider>();
+            builder.ForType<NugetInstallationProvider>().Export<IInstallationProvider>().Export<INugetInstallationProvider>();
             builder.ForType<PackageInstaller>().Export<IPackageInstaller>();
 
             builder.ForType<NullScriptLibraryComposer>().Export<IScriptLibraryComposer>();
-            builder.ForType<ScriptPackResolver>().Export<IScriptPackResolver>();
+            builder.ForType<Package.ScriptPackResolver>().Export<IScriptPackResolver>();
 
             builder.ForType<AssemblyUtility>().Export<IAssemblyUtility>();
             builder.ForType<AssemblyResolver>().SelectNonObsoleteConstructor().Export<IAssemblyResolver>();
@@ -114,7 +117,7 @@ namespace CShell.Hosting
             IScriptLibraryComposer scriptLibraryComposer = container.GetExportedValue<IScriptLibraryComposer>();
 
             IEnumerable<IReplCommand> replCommands = container.GetExportedValues<IReplCommand>();
-
+            IEnumerable<IScriptPack> scriptPacks = container.GetExportedValues<IScriptPack>();
             IScriptEngine engine = container.GetExportedValue<IScriptEngine>();
             IRepl repl = container.GetExportedValue<IRepl>();
             IScriptExecutor executor = container.GetExportedValue<IScriptExecutor>();

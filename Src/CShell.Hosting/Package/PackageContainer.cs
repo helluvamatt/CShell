@@ -118,8 +118,7 @@ namespace CShell.Hosting.Package
 
             foreach (var arbitraryPackage in arbitraryPackages)
             {
-                var newestFramework = GetNewestSupportedFramework(arbitraryPackage)
-                    ?? VersionUtility.EmptyFramework;
+                var newestFramework = GetSupportedFrameworkName(arbitraryPackage);
 
                 yield return new PackageReference(
                         arbitraryPackage.Id,
@@ -127,6 +126,12 @@ namespace CShell.Hosting.Package
                         arbitraryPackage.Version.Version,
                         arbitraryPackage.Version.SpecialVersion);
             }
+        }
+
+        public static FrameworkName GetSupportedFrameworkName(IPackage arbitraryPackage)
+        {
+            return GetNewestSupportedFramework(arbitraryPackage)
+                   ?? VersionUtility.EmptyFramework;
         }
 
         private static FrameworkName GetNewestSupportedFramework(IPackage packageMetadata)

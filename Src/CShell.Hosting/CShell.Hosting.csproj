@@ -112,11 +112,15 @@
     <Compile Include="FileSystem.cs" />
     <Compile Include="HostingHelpers.cs" />
     <Compile Include="ObjectSerializer.cs" />
+    <Compile Include="Package\INugetInstallationProvider.cs" />
+    <Compile Include="Package\IPackageInfo.cs" />
     <Compile Include="Package\NugetInstallationProvider.cs" />
     <Compile Include="Package\NugetMachineWideSettings.cs" />
     <Compile Include="Package\PackageContainer.cs" />
+    <Compile Include="Package\PackageHelper.cs" />
     <Compile Include="Package\PackageInstaller.cs" />
     <Compile Include="Package\PackageObject.cs" />
+    <Compile Include="Package\ScriptPackResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplCommands\ClearCommand.cs" />
     <Compile Include="ReplCommands\HelpCommand.cs" />

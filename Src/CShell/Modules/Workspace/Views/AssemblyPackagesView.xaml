@@ -3,9 +3,88 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="500" d:DesignWidth="650">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <xcad:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <xcad:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
-        <Label>Not Implemented (Yet), Sorry!</Label>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Visibility="{Binding Path=IsSearching, Converter={StaticResource InverseBoolToVisibilityConverter}, Mode=OneWay}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="Filter" Text="{Binding Path=FilterText, Mode=TwoWay}" Height="30" FontSize="18" HorizontalAlignment="Stretch" TextBlock.LineHeight="30" TextBlock.LineStackingStrategy="BlockLineHeight" Grid.Column="0"/>
+            <Button Content="Search" cal:Message.Attach="Search" Height="30" Width="75" FontSize="16" Grid.Column="1" />
+        </Grid>
+        <ScrollViewer x:Name="ScrollViewer" VerticalScrollBarVisibility="Auto" Grid.Row="1" Visibility="{Binding Path=IsSearching, Converter={StaticResource InverseBoolToVisibilityConverter}, Mode=OneWay}">
+            <StackPanel>
+                <ItemsControl x:Name="Packages" ItemsSource="{Binding Path=PackageReferences}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                <Grid Margin="10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <Image x:Name="Icon" Width="24" Height="24" Margin="5" Source="{Binding Path=IconUrl}" RenderOptions.BitmapScalingMode="HighQuality" />
+                                            <TextBlock x:Name="Title" Text="{Binding Path=Title}" Style="{StaticResource SubHeading}" Margin="5" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                            <TextBlock Margin="20 5 5 5">
+                                                <TextBlock Style="{StaticResource IconCloudDownload}" />
+                                                <TextBlock x:Name="DownloadCount" Text="{Binding Path=DownloadCount, StringFormat=N0}" Margin="0" />
+                                            </TextBlock>
+                                            <TextBlock Margin="10 5 5 5">
+                                                <TextBlock Style="{StaticResource IconCalendarPlus}" />
+                                                <TextBlock x:Name="PublishedDate" Text="{Binding Path=PublishedDate}" Margin="0"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock x:Name="Description" Grid.Row="1" Margin="5" TextWrapping="Wrap" Text="{Binding Path=Description}"/>
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="Authors" Text="{Binding Path=Authors}" Style="{StaticResource SubHeading}" Margin="5" Grid.Column="0"/>
+                                        <Button cal:Message.Attach="Install($dataContext)" Grid.Column="1" Padding="4">
+                                            <TextBlock>
+                                                <TextBlock Style="{StaticResource IconDownload}" />
+                                                <TextBlock Text="Install" Margin="0" />
+                                                <TextBlock x:Name="LatestVersion" Text="{Binding Path=TextVersion}" Margin="0" />
+                                            </TextBlock>
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid x:Name="IsBusy" VerticalAlignment="Center" Visibility="{Binding Path=IsSearching, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="1">
+            <ProgressBar IsIndeterminate="True" Height="15" MaxWidth="300"/>
+            <TextBlock Text="Searching..." Style="{StaticResource MutedSubHeading}" HorizontalAlignment="Center"/>
+        </Grid>
     </Grid>
 </UserControl>

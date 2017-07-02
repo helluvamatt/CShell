@@ -110,8 +110,8 @@ namespace CShell.Modules.Workspace
 
         public static IEnumerable<IResult> MangePackages()
         {
-            var windowSettings = new Dictionary<string, object> { { "SizeToContent", SizeToContent.Manual }, { "Width", 500.0 }, { "Height", 500.0 } };
-            var dialog = new AssemblyPackagesViewModel();
+            var windowSettings = new Dictionary<string, object> { { "SizeToContent", SizeToContent.Manual }, { "Width", 700.0 }, { "Height", 500.0 } };
+            var dialog = IoC.Get<AssemblyPackagesViewModel>();
             yield return Show.Dialog(dialog, windowSettings);
         }
 
