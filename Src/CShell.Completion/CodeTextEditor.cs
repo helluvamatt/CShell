@@ -48,7 +48,7 @@ namespace CShell.Completion
 
             FileName = fileName;
             Load(fileName);
-            SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(fileName));
+            SyntaxHighlighting = GetHighlighting(Path.GetExtension(fileName));
         }
 
         public bool SaveFile()
@@ -219,6 +219,33 @@ namespace CShell.Completion
         }
         #endregion
 
+        public static IHighlightingDefinition GetHighlighting(string fileExtension)
+        {
+            var def = HighlightingManager.Instance.GetDefinitionByExtension(fileExtension);
+            //if the definition was not found try the custom extensions
+            if (def == null)
+            {
+                switch (fileExtension)
+                {
+                    case ".cshell":
+                    case ".csx":
+                        def = HighlightingManager.Instance.GetDefinition("C#");
+                        break;
+                }
+            }
+            return def;
 
+            //var resourceManager = IoC.Get<IResourceManager>();
+            //resourceManager.GetBitmap("Resources/Icon.ico",
+            //    Assembly.GetExecutingAssembly().GetAssemblyName());
+
+            //using (Stream s = myAssembly.GetManifestResourceStream("MyHighlighting.xshd"))
+            //{
+            //    using (XmlTextReader reader = new XmlTextReader(s))
+            //    {
+            //        textEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+            //    }
+            //}
+        }
     }
 }

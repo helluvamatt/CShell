@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Net;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Input;
+
 using CShell.Completion;
 using CShell.Framework;
-using CShell.Framework.Services;
 using CShell.Modules.Editors.Controls;
 using CShell.Modules.Editors.Views;
-using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Document;
-using ICSharpCode.AvalonEdit.Editing;
-using ICSharpCode.AvalonEdit.Highlighting;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+
 using Execute = CShell.Framework.Services.Execute;
 
 namespace CShell.Modules.Editors.ViewModels
@@ -134,7 +126,7 @@ namespace CShell.Modules.Editors.ViewModels
 		    var extension = Path.GetExtension(path);
 		    extension = extension == null ? "" : extension.ToLower();
 		    textEditor.ShowLineNumbers = true;
-            textEditor.SyntaxHighlighting = GetHighlighting(extension);
+            textEditor.SyntaxHighlighting = CodeTextEditor.GetHighlighting(extension);
 
 		    if (workspace != null && workspace.ReplExecutor.DocumentCompletion != null && (extension == ".cs" || extension == ".csx"))
 		    {
@@ -173,6 +165,8 @@ namespace CShell.Modules.Editors.ViewModels
 		                                _isReloadingDocument = true;
                                         _fileSystemWatcher.EnableRaisingEvents = false;
 		                                textEditor.OpenFile(path);
+
+		                                originalText = textEditor.Text;
                                     }
 		                            finally 
 		                            {
@@ -199,9 +193,18 @@ namespace CShell.Modules.Editors.ViewModels
         {
             Execute.OnUIThreadEx(() =>
             {
-                textEditor.Save(path);
-                originalText = textEditor.Text;
-                IsDirty = false;
+                try
+                {
+                    _fileSystemWatcher.EnableRaisingEvents = false;
+
+                    textEditor.Save(path);
+                    originalText = textEditor.Text;
+                    IsDirty = false;
+                }
+                finally 
+                {
+                    _fileSystemWatcher.EnableRaisingEvents = true;
+                }
             });
         }
 
@@ -248,35 +251,6 @@ namespace CShell.Modules.Editors.ViewModels
 			var other = obj as EditorViewModel;
 		    return other != null && Uri == other.Uri;
 		}
-
-        private IHighlightingDefinition GetHighlighting(string fileExtension)
-        {
-            var def = HighlightingManager.Instance.GetDefinitionByExtension(fileExtension);
-            //if the definition was not found try the custom extensions
-            if(def == null)
-            {
-                switch (fileExtension)
-                {
-                    case ".cshell":
-                    case ".csx":
-                        def = HighlightingManager.Instance.GetDefinition("C#");
-                        break;
-                }
-            }
-            return def;
-
-            //var resourceManager = IoC.Get<IResourceManager>();
-            //resourceManager.GetBitmap("Resources/Icon.ico",
-            //    Assembly.GetExecutingAssembly().GetAssemblyName());
-
-            //using (Stream s = myAssembly.GetManifestResourceStream("MyHighlighting.xshd"))
-            //{
-            //    using (XmlTextReader reader = new XmlTextReader(s))
-            //    {
-            //        textEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-            //    }
-            //}
-        }
 
         #region ITextDocument
         public void Undo()
