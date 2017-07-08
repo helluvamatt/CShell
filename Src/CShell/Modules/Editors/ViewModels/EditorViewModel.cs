@@ -31,6 +31,9 @@ namespace CShell.Modules.Editors.ViewModels
 
 	    private string toAppend;
 	    private string toPrepend;
+        private FileSystemWatcher _fileSystemWatcher;
+
+	    private bool _isReloadingDocument;
 
         public EditorViewModel(CShell.Workspace workspace)
 	    {
@@ -91,7 +94,18 @@ namespace CShell.Modules.Editors.ViewModels
             });
 		}
 
-		public void Open(Uri uri)
+	    protected override void OnDeactivate(bool close)
+	    {
+	        base.OnDeactivate(close);
+
+	        if (close && _fileSystemWatcher != null)
+	        {
+	            _fileSystemWatcher.EnableRaisingEvents = false;
+                _fileSystemWatcher.Dispose();
+	        }
+        }
+
+	    public void Open(Uri uri)
 		{
 		    this.Uri = uri;
 		    var decodedPath = Uri.UnescapeDataString(uri.AbsolutePath);
@@ -110,7 +124,10 @@ namespace CShell.Modules.Editors.ViewModels
 
             textEditor.TextChanged += delegate
 			{
-                IsDirty = string.Compare(originalText, textEditor.Text) != 0;
+			    if (!_isReloadingDocument)
+			    {
+			        IsDirty = string.Compare(originalText, textEditor.Text) != 0;
+			    }
 			};
 
             //some other settings
@@ -136,6 +153,35 @@ namespace CShell.Modules.Editors.ViewModels
                 Prepend(toPrepend);
                 toPrepend = null;
             }
+
+		    _fileSystemWatcher = new FileSystemWatcher(Path.GetDirectoryName(path))
+		            {
+		                Filter = fileName,
+		                NotifyFilter = NotifyFilters.LastWrite,
+                        EnableRaisingEvents = true
+		            };
+		    _fileSystemWatcher.Changed += (sender, args) =>
+		        {
+		            Execute.OnUIThreadEx(
+		                () =>
+		                    {
+		                        MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "The document has beed modified outside the editor. Do you want to reload it?" + Environment.NewLine + Uri.AbsolutePath, "Confirmation", MessageBoxButton.YesNoCancel);
+		                        if (result == MessageBoxResult.Yes)
+		                        {
+		                            try
+		                            {
+		                                _isReloadingDocument = true;
+                                        _fileSystemWatcher.EnableRaisingEvents = false;
+		                                textEditor.OpenFile(path);
+                                    }
+		                            finally 
+		                            {
+		                                _fileSystemWatcher.EnableRaisingEvents = true;
+		                                _isReloadingDocument = false;
+                                    }
+                                }
+                            });
+                };
 
             //debug to see what commands are available in the editor
             //var c = textEditor.TextArea.CommandBindings;
