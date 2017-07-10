@@ -27,10 +27,10 @@ namespace CShell.Sinks.Xhtml
             get { return PaneLocation.Right; }
         }
 
-        private string text = "";
+        private string _text = "";
         public string Text
         {
-            get { return text; }
+            get { return _text; }
         }
 
         public override void Dump(object o)
@@ -46,9 +46,9 @@ namespace CShell.Sinks.Xhtml
             }
 
             xhtmlDumper.WriteObject(o, null, 3);
-            text = stringBuilder.ToString();
+            _text = stringBuilder.ToString();
             //append the closing HTML closing tags to the string
-            text += Environment.NewLine + "</body></html>";
+            _text += Environment.NewLine + "</body></html>";
 
             NotifyOfPropertyChange(()=>Text);
         }
@@ -59,7 +59,7 @@ namespace CShell.Sinks.Xhtml
                 linqPadWriter.Dispose();
             linqPadWriter = null;
 
-            text = String.Empty;
+            _text = String.Empty;
             NotifyOfPropertyChange(() => Text);
         }
 
@@ -75,5 +75,11 @@ namespace CShell.Sinks.Xhtml
             return other != null && Uri == other.Uri;
         }
 
+        public void ClearSink()
+        {
+            _text = "<html><header></header><body></body></html>";
+
+            NotifyOfPropertyChange(() => Text);
+        }
     }
 }

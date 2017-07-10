@@ -6,6 +6,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <WebBrowser x:Name="webBrowser" DataContextChanged="webBrowser_DataContextChanged" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button Grid.Row="0" Content="Clear" cal:Message.Attach="ClearSink"></Button>
+        <WebBrowser Grid.Row="1" x:Name="webBrowser" DataContextChanged="webBrowser_DataContextChanged" />
     </Grid>
 </UserControl>
